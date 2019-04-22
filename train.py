@@ -31,6 +31,10 @@ def my_mse(a, b):
 def myL1(a,b):
     return torch.mean(torch.abs(a - b))
 
+def writeModel(f, model, modelName):
+    f.write('%s:\n'%modelName)
+    f.write(str(model))
+    f.write('\n\n======================================================================================================\n\n')
 
 parser = argparse.ArgumentParser()
 #parser.add_argument('--dataset', type=str, default='cifar100', help='cifar10 | cifar100 | folder')
@@ -45,6 +49,9 @@ parser.add_argument('--learningRate', type=float, default=0.001, help='learning 
 parser.add_argument('--cuda', action='store_true', help='enables cuda')
 parser.add_argument('--nGPU', type=int, default=1, help='number of GPUs to use')
 parser.add_argument('--out', type=str, default='checkpoints', help='folder to output model checkpoints')
+parser.add_argument('--tripletLossMargin', type=float, default=1, help='margin for triplet loss')
+parser.add_argument('--FMLayerParameter', type=int, default=10, help='the layer in the classifier from which the features will be extracted')
+
 
 
 opt = parser.parse_args()
@@ -52,7 +59,7 @@ print(opt)
 
 useConcat = True
 classifyFonts = True
-useFeatureMatchingLoss = False
+useFeatureMatchingLoss = True
 useMSE = False
 mar = 1
 
@@ -72,15 +79,15 @@ fontClassifierModelPath = '/home/messin/dev/python/Pytorch-srgan/fontClassifier/
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/toDelete/'
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/trainCross_Apr2_normFix_cycleLoss/'
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1_lastConvInsteadOfLastRelu/'
-opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer8_Par9_afterConv/'
+opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr22_L1Margin1_FMPar10/'
 
 checkpointsDir = '%s/checkpoints/' % opt.out
 resultsDir = '%s/results/' % opt.out
 
-if not os.path.exists(opt.out):
-    os.makedirs(opt.out)
-    os.makedirs(checkpointsDir)
-    os.makedirs(resultsDir)
+folders = [opt.out, checkpointsDir, resultsDir]
+for f in folders:
+    if not os.path.exists(f):
+        os.makedirs(f)
 
 
 opt.phase = 'train'
@@ -99,14 +106,26 @@ opt.max_dataset_size = float("inf")
 #opt.which_direction = 'AToB'
 opt.input_nc = 1
 opt.nc = 1
+opt.useConcat = useConcat
+opt.classifyFonts = classifyFonts
+opt.useFeatureMatchingLoss = useFeatureMatchingLoss
+opt.useMSE = useMSE
 data_loader = CreateDataLoader(opt)
 dataloader = data_loader.load_data()
 dataset_size = len(data_loader)
 print('#training images = %d' % dataset_size)
 
 
+
 lfile = os.path.join(opt.out, 'loss_log.txt')
 lfile_handle = open(lfile, 'w')
+
+optFile = os.path.join(opt.out, 'opt.txt')
+optFile_handle = open(optFile, 'w')
+optFile_handle.write(str(opt))
+
+modelFile = os.path.join(opt.out, 'models.txt')
+modelFile_handle = open(modelFile, 'w')
 
 
 with torch.no_grad():
@@ -126,6 +145,14 @@ with torch.no_grad():
 cont_enc = _EncoderNoa(opt.imageSize)
 stl_enc = _EncoderNoa(opt.imageSize)
 dec = _DecoderNoa(opt.imageSize, useConcat)
+
+writeModel(modelFile_handle, feature_extractor, "feature_extractor")
+writeModel(modelFile_handle, classifier, "classifier")
+writeModel(modelFile_handle, cont_enc, "cont_enc")
+writeModel(modelFile_handle, stl_enc, "stl_enc")
+writeModel(modelFile_handle, dec, "dec")
+
+
 #decr = _DecoderNoa(opt.imageSize)
 mse_criterion = nn.MSELoss()
 L1criterion = nn.L1Loss()
@@ -234,16 +261,17 @@ for epoch in range(opt.nEpochs):
         d6 = my_mse(cont2, cont21) #different content same style
         loss3 = torch.clamp(d5 - d6 + mar, min=0.0)
         d7 = my_mse(cont2, cont12) #same content  - content2 different style
-        d8 = my_mse(cont1, cont12) #different content same style
+        d8 = my_mse(cont1, cont12) #different content same styleFMLayerParameter
         loss4 = torch.clamp(d7 - d8 + mar, min=0.0)
 
         trip_loss = loss1 + loss2 + loss3 + loss4
 
         if useFeatureMatchingLoss:
-            style1Content2FeaturesOrig = feature_extractor(img12, level=9, start_level=0)
-            style2Content1FeaturesOrig = feature_extractor(img21, level=9, start_level=0)
-            style1Content2FeaturesOutput = feature_extractor(dec12, level=9, start_level=0)
-            style2Content1FeaturesOutput = feature_extractor(dec21, level=9, start_level=0)
+            level = opt.FMLayerParameter
+            style1Content2FeaturesOrig = feature_extractor(img12, level=level, start_level=0)
+            style2Content1FeaturesOrig = feature_extractor(img21, level=level, start_level=0)
+            style1Content2FeaturesOutput = feature_extractor(dec12, level=level, start_level=0)
+            style2Content1FeaturesOutput = feature_extractor(dec21, level=level, start_level=0)
             # fmLossStyle1Content2 = 0.00000001 * mse_criterion(style1Content2FeaturesOutput, style1Content2FeaturesOrig)
             # fmLossStyle2Content1 = 0.00000001 * mse_criterion(style2Content1FeaturesOutput, style2Content1FeaturesOrig)
             fmLossStyle1Content2 = 0.000001*mse_criterion(style1Content2FeaturesOutput, style1Content2FeaturesOrig)

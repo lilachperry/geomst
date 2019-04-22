@@ -23,19 +23,20 @@ import imageio
 import glob
 
 useConcat = True
-comparedEpoch = 200
+comparedEpoch = 110
 
 
-destHtmlsPath = '/mnt/data/messin/dev/python/autoEncoder/TestHtmls/Apr17/ComparedEpoch_200/'
+destHtmlsPath = '/mnt/data/messin/dev/python/autoEncoder/TestHtmls/Apr22/ComparedEpoch_110/'
 
-#path4 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr14_withTripletAndCycle_Margin1_Epoch200'
-path1 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr15_L1withFMLossMargin1_Epoch200'
-path2 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr15_L1Margin1_TripletLossFix_Epoch200'
-path3 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr14_withTripletAndCycle_L1_Epoch200'
+#
+path1 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr15_L1withFMLossMargin1_Epoch110'
+path2 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr21_L1Margin1_FMLayer8_Par9_afterConv_Epoch110'
+path3 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr21_L1Margin1_FMLayer6_Par7_Epoch110'
+path4 = '/mnt/data/messin/dev/python/autoEncoder/outTest/apr21_L1Margin1_FMLayer9_Par10_Epoch110'
 
-methodDisplayNames = ['Margin1_FMLoss_L1', 'L1TripletLossFix', 'L1']
+methodDisplayNames = ['Margin1_FMLoss_L1', 'FMLayer8_Par9_afterConv', 'apr21_L1Margin1_FMLayer6_Par7', 'apr21_L1Margin1_FMLayer9_Par10']
 
-allPaths  = [path1, path2, path3]
+allPaths  = [path1, path2, path3, path4]
 
 if not os.path.exists(destHtmlsPath):
     os.makedirs(destHtmlsPath)

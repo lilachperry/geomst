@@ -23,7 +23,7 @@ import imageio
 from sklearn.decomposition import PCA
 
 useConcat = True
-comparedEpoch = 200
+comparedEpoch = 110
 #-----------------------noa----------------------------------------------
 # contEncPath = '/home/noafish/geomst/concat/cont_enc_epoch_110.pth'
 # styleEncPath = '/home/noafish/geomst/concat/stl_enc_epoch_110.pth'
@@ -59,10 +59,10 @@ comparedEpoch = 200
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------apr14_withTripletAndCycle_L1----------------------------------------------------------------------------
-contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/cont_enc_epoch_200.pth'
-styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/stl_enc_epoch_200.pth'
-decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/dec_epoch_200.pth'
-methodName = 'apr14_withTripletAndCycle_L1'
+# contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/cont_enc_epoch_200.pth'
+# styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/stl_enc_epoch_200.pth'
+# decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr14_withTripletAndCycle_L1/checkpoints/dec_epoch_200.pth'
+# methodName = 'apr14_withTripletAndCycle_L1'
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------apr14_withTripletAndCycle_Margin1----------------------------------------------------------------------------
@@ -73,10 +73,10 @@ methodName = 'apr14_withTripletAndCycle_L1'
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------apr15_L1withFMLossMargin1----------------------------------------------------------------------------
-# contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/cont_enc_epoch_200.pth'
-# styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/stl_enc_epoch_200.pth'
-# decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/dec_epoch_200.pth'
-# methodName = 'apr15_L1withFMLossMargin1'
+contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/cont_enc_epoch_110.pth'
+styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/stl_enc_epoch_110.pth'
+decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1/checkpoints/dec_epoch_110.pth'
+methodName = 'apr15_L1withFMLossMargin1'
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 #-----------------------apr15_L1Margin1_TripletLossFix----------------------------------------------------------------------------
@@ -84,6 +84,25 @@ methodName = 'apr14_withTripletAndCycle_L1'
 # styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1Margin1_TripletLossFix/checkpoints/stl_enc_epoch_200.pth'
 # decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1Margin1_TripletLossFix/checkpoints/dec_epoch_200.pth'
 # methodName = 'apr15_L1Margin1_TripletLossFix'
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------apr21_L1Margin1_FMLayer8_Par9_afterConv----------------------------------------------------------------------------
+# contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer8_Par9_afterConv/checkpoints/cont_enc_epoch_110.pth'
+# styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer8_Par9_afterConv/checkpoints/stl_enc_epoch_110.pth'
+# decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer8_Par9_afterConv/checkpoints/dec_epoch_110.pth'
+# methodName = 'apr21_L1Margin1_FMLayer8_Par9_afterConv'
+#--------------------------------------------------------------------------------------------------------------------------------------
+#-----------------------apr21_L1Margin1_FMLayer6_Par7----------------------------------------------------------------------------
+# contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer6_Par7/checkpoints/cont_enc_epoch_110.pth'
+# styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer6_Par7/checkpoints/stl_enc_epoch_110.pth'
+# decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer6_Par7/checkpoints/dec_epoch_110.pth'
+# methodName = 'apr21_L1Margin1_FMLayer6_Par7'
+#--------------------------------------------------------------------------------------------------------------------------------------
+
+#-----------------------apr21_L1Margin1_FMLayer9_Par10----------------------------------------------------------------------------
+# contEncPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer9_Par10/checkpoints/cont_enc_epoch_110.pth'
+# styleEncPath = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer9_Par10/checkpoints/stl_enc_epoch_110.pth'
+# decPath =  '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr21_L1Margin1_FMLayer9_Par10/checkpoints/dec_epoch_110.pth'
+# methodName = 'apr21_L1Margin1_FMLayer9_Par10'
 #--------------------------------------------------------------------------------------------------------------------------------------
 
 
