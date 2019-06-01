@@ -50,12 +50,9 @@ def get_transform(opt):
     if opt.gray:
         transform_list.append(transforms.Grayscale())
 
-    if opt.shouldNormalize:
-        transform_list += [transforms.ToTensor(),
-                           transforms.Normalize((0.5, 0.5, 0.5),
-                                                (0.5, 0.5, 0.5))]
-    else:
-        transform_list += [transforms.ToTensor()]
+    transform_list += [transforms.ToTensor(),
+                       transforms.Normalize((0.5, 0.5, 0.5),
+                                            (0.5, 0.5, 0.5))]
     return transforms.Compose(transform_list)
 
 def get_transformFMLoss(opt):

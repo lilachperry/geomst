@@ -46,7 +46,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--nClasses', type=int, default=132, help='number of classes')
 parser.add_argument('--workers', type=int, default=4, help='number of data loading workers')
 parser.add_argument('--batchSize', type=int, default=32, help='input batch size')
-parser.add_argument('--imageSize', type=int, default=64, help='the low resolution image size')
+parser.add_argument('--imageSize', type=int, default=16, help='the low resolution image size')
 parser.add_argument('--nEpochs', type=int, default=1000, help='number of epochs to train for')
 parser.add_argument('--MSEWeight', type=int, default=100, help='the weight of the MSE loss')
 parser.add_argument('--learningRate', type=float, default=0.001, help='learning rate for optimizer')
@@ -84,8 +84,8 @@ fontClassifierModelPath = '/home/messin/dev/python/Pytorch-srgan/fontClassifier/
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/toDelete/'
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/trainCross_Apr2_normFix_cycleLoss/'
 #opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/apr15_L1withFMLossMargin1_lastConvInsteadOfLastRelu/'
-#opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/may3_TrainAllPatches_imsize16/'
-opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/may15SmallStyleCode/'
+#opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/may6_imsize16_Akronim/'
+opt.out = '/mnt/data/messin/dev/python/autoEncoder/outTrain/testTO_DELETE/'
 
 checkpointsDir = '%s/checkpoints/' % opt.out
 resultsDir = '%s/results/' % opt.out
@@ -98,13 +98,14 @@ for f in folders:
 
 #opt.phase = 'train'
 opt.phase = ''
-#opt.dataset_mode = 'unaligned'
-opt.dataset_mode = 'onefont'
+opt.dataset_mode = 'unaligned'
 #opt.dataroot = '/home/noafish/geomst/patches4'
+opt.datarootA = '/home/messin/dev/python/geomst/dataset/pairs/Akronim/train'
+opt.datarootB = '/home/messin/dev/python/geomst/dataset/pairs/DilatedAkronim/train'
+opt.aName = 'Akronim'
+opt.bName = 'DilatedAkronim'
 #opt.dataroot = '/home/messin/dev/python/geomst/dataset/fonts'
 #opt.dataroot = '/home/messin/dev/python/geomst/dataset/clusterFeatures/letterClassifierLayerPar9_apr24_2/cluster2/Images'
-opt.dataroot = '/home/messin/dev/python/geomst/dataset/clusterFeatures/letterClassifierLayerPar9_apr25/cluster3NoLinks/train'
-opt.chosenFontDir = '/home/messin/dev/python/geomst/dataset/clusterFeatures/letterClassifierLayerPar9_apr25/cluster3NoLinks/chosen'
 opt.resize_or_crop = 'resize_and_crop'
 opt.fineSize = opt.imageSize #64
 opt.loadSize = opt.imageSize #64
@@ -122,8 +123,6 @@ opt.useConcat = useConcat
 opt.classifyFonts = classifyFonts
 opt.useFeatureMatchingLoss = useFeatureMatchingLoss
 opt.useMSE = useMSE
-opt.styleEnc_nz = 50
-opt.contentEnc_nz = 100
 data_loader = CreateDataLoader(opt)
 dataloader = data_loader.load_data()
 dataset_size = len(data_loader)
@@ -157,12 +156,9 @@ with torch.no_grad():
     print(feature_extractor)
 
 
-cont_enc = _EncoderNoa(opt.imageSize, opt.contentEnc_nz)
-stl_enc = _EncoderNoa(opt.imageSize, opt.styleEnc_nz)
-if useConcat:
-    dec = _DecoderNoa(opt.imageSize, opt.contentEnc_nz + opt.styleEnc_nz)
-else:
-    dec = _DecoderNoa(opt.imageSize, opt.contentEnc_nz)
+cont_enc = _EncoderNoa(opt.imageSize)
+stl_enc = _EncoderNoa(opt.imageSize)
+dec = _DecoderNoa(opt.imageSize, useConcat)
 
 writeModel(modelFile_handle, feature_extractor, "feature_extractor")
 writeModel(modelFile_handle, classifier, "classifier")
@@ -204,14 +200,21 @@ for epoch in range(opt.nEpochs):
 
         img1 = data['A']
         img2 = data['B']
-        img12 = data['A2'] #style1Content2
-        img21 = data['B2'] #style2Content1
+        img12 = data['contentBStyleA'] #style1Content2
+        img21 = data['contentAStyleB'] #style2Content1
+        if opt.useFeatureMatchingLoss:
+            img12_FM = data['contentBStyleA_FM']  # style1Content2
+            img21_FM = data['contentAStyleB_FM']  # style2Content1
 
         if opt.cuda:
             img1 = img1.cuda()
             img2 = img2.cuda()
             img12 = img12.cuda() #style1Content2
             img21 = img21.cuda() #style2Content1
+
+            if opt.useFeatureMatchingLoss:
+                img12_FM = img12_FM.cuda()
+                img21_FM = img21_FM.cuda()
 
         #path1 = data['A_paths'][0]
         #path2 = data['B_paths'][0]
@@ -287,10 +290,12 @@ for epoch in range(opt.nEpochs):
 
         if useFeatureMatchingLoss:
             level = opt.FMLayerParameter
-            style1Content2FeaturesOrig = feature_extractor(img12, level=level, start_level=0)
-            style2Content1FeaturesOrig = feature_extractor(img21, level=level, start_level=0)
-            style1Content2FeaturesOutput = feature_extractor(dec12, level=level, start_level=0)
-            style2Content1FeaturesOutput = feature_extractor(dec21, level=level, start_level=0)
+            style1Content2FeaturesOrig = feature_extractor(img12_FM, level=level, start_level=0)
+            style2Content1FeaturesOrig = feature_extractor(img21_FM, level=level, start_level=0)
+            dec12Resized = resizeIm(dec12, opt.FMInputSize)
+            dec21Resized = resizeIm(dec21, opt.FMInputSize)
+            style1Content2FeaturesOutput = feature_extractor(dec12Resized, level=level, start_level=0)
+            style2Content1FeaturesOutput = feature_extractor(dec21Resized, level=level, start_level=0)
             # fmLossStyle1Content2 = 0.00000001 * mse_criterion(style1Content2FeaturesOutput, style1Content2FeaturesOrig)
             # fmLossStyle2Content1 = 0.00000001 * mse_criterion(style2Content1FeaturesOutput, style2Content1FeaturesOrig)
             fmLossStyle1Content2 = 0.000001*mse_criterion(style1Content2FeaturesOutput, style1Content2FeaturesOrig)

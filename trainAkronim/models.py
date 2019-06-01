@@ -245,13 +245,13 @@ class KfirFeatureExtractor(nn.Module):
 
 
 
-
+nz = 100
 ngf = 64
 ndf = 64
 nc = 1
 
 class _EncoderNoa(nn.Module):
-    def __init__(self, imageSize, nz):
+    def __init__(self, imageSize):
         super(_EncoderNoa, self).__init__()
 
         n = math.log(imageSize, 2)
@@ -325,7 +325,7 @@ class _EncoderNoa(nn.Module):
 
 
 class _DecoderNoa(nn.Module):
-    def __init__(self, imageSize, nz):
+    def __init__(self, imageSize, useConcat):
         super(_DecoderNoa, self).__init__()
 
         n = math.log(imageSize, 2)
@@ -336,7 +336,10 @@ class _DecoderNoa(nn.Module):
 
         self.decoder = nn.Sequential()
         # input is Z, going into a convolution
-        self.decoder.add_module('input-conv', nn.ConvTranspose2d(nz, ngf * 2 ** (n - 3), 4, 1, 0, bias=False))
+        if useConcat:
+            self.decoder.add_module('input-conv', nn.ConvTranspose2d(2*nz, ngf * 2 ** (n - 3), 4, 1, 0, bias=False))
+        else:
+            self.decoder.add_module('input-conv', nn.ConvTranspose2d(nz, ngf * 2 ** (n - 3), 4, 1, 0, bias=False))
         self.decoder.add_module('input-batchnorm', nn.BatchNorm2d(ngf * 2 ** (n - 3)))
         self.decoder.add_module('input-relu', nn.LeakyReLU(0.2, inplace=True))
 
